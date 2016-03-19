@@ -19,4 +19,10 @@ Here are some Amazon links on what I've purchased to get this project going
 - Anycubic 5V 16 Channel Relay Module Board with Optocoupler Protection LM2576 Power for Arduino http://www.amazon.com/gp/product/B014SV3II2
 - 12V LEDs for testing http://www.amazon.com/gp/product/B019W8T65K
 - 12V Solenoid valves
-- Stuff for the poofer from http://www.poofersupply.com
+- Stuff for the poofer from http://www.poofersupply.com 
+
+
+### Addiing code   
+
+    git commit -m" " 
+    git push -u origin master
