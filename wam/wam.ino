@@ -152,10 +152,10 @@ byte set_random_button(void)
   byte newButton = random(0, NR_LEDS); //min (included), max (exluded)
 
   // We have to convert this number, 0 to 3, to CHOICEs
-  if(newButton == 0)      return CHOICE_RED;
-  else if(newButton == 1) return CHOICE_GREEN;
-  else if(newButton == 2) return CHOICE_BLUE;
-  else if(newButton == 3) return CHOICE_YELLOW;
+  if(newButton == 0)      return CHOICE_RED;     // 0001 
+  else if(newButton == 1) return CHOICE_GREEN;   // 0010
+  else if(newButton == 2) return CHOICE_BLUE;   //  0100 
+  else if(newButton == 3) return CHOICE_YELLOW;  // 1000
 
 }
 
@@ -165,16 +165,16 @@ byte set_random_button(void)
 
 // Lights a given LEDs
 // Pass in a byte that is made up from CHOICE_RED, CHOICE_YELLOW, etc
-void setLEDs(byte leds)
+void setLEDs(byte leds)      // 1011 
 {
-  if ((leds & CHOICE_RED) != 0)
-    digitalWrite(LED_RED, HIGH);
+  if ((leds & CHOICE_RED) != 0)      // 0001 
+    digitalWrite(LED_RED, HIGH);     // turn on LED 
   else
-    digitalWrite(LED_RED, LOW);
+    digitalWrite(LED_RED, LOW);      // turn off LED 
 
-  if ((leds & CHOICE_GREEN) != 0)
-    digitalWrite(LED_GREEN, HIGH);
-  else
+  if ((leds & CHOICE_GREEN) != 0)    // 0010
+    digitalWrite(LED_GREEN, HIGH);   // turn on LED  
+  else    
     digitalWrite(LED_GREEN, LOW);
 
   if ((leds & CHOICE_BLUE) != 0)
@@ -252,11 +252,30 @@ byte wait_for_button(int entry_time_limit)
 
 
 // Returns a '1' bit in the position corresponding to CHOICE_RED, CHOICE_GREEN, etc.
+
+/*
+ *   Return the button which matches the light 
+ *   (This is where the button and the light get matched up. 
+ *   
+ *  Another way: Define the Pin, the corresponding button and the binary representation. 
+ *  
+ *  struct ledButtonByte{
+ *     int ledPin;
+ *     int buttonPin;
+ *     byte byteRepresentation; 
+ *     } sensors [10]; 
+ *     
+ *     sensors[1].ledPin = 8
+ *     sensors[1].buttonPin = 24
+ *     sensors[1].byteRepresentation = 0001 
+ *  
+ */
+
 byte checkButton(void)
 {
-  if (digitalRead(BUTTON_RED) == 0) return(CHOICE_RED); 
-  else if (digitalRead(BUTTON_GREEN) == 0) return(CHOICE_GREEN); 
-  else if (digitalRead(BUTTON_BLUE) == 0) return(CHOICE_BLUE); 
+  if (digitalRead(BUTTON_RED) == 0)         return(CHOICE_RED);       // return 0001 
+  else if (digitalRead(BUTTON_GREEN) == 0)  return(CHOICE_GREEN);     // return 0010 
+  else if (digitalRead(BUTTON_BLUE) == 0)   return(CHOICE_BLUE); 
   else if (digitalRead(BUTTON_YELLOW) == 0) return(CHOICE_YELLOW);
 
   return(CHOICE_NONE); // If no button is pressed, return none

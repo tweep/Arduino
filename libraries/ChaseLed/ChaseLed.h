@@ -10,8 +10,8 @@ class ChaseLed {
    public: 
      ChaseLed(byte pin[]); 
      ~ChaseLed(); 
-    void on(byte led); 
-    void off(byte led); 
+     void on(byte led); 
+     void off(byte led); 
     private:        
      byte _pins[]; 
 }; 
