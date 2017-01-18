@@ -1,0 +1,8 @@
+// use TAB not spaces
+
+ChaseLed	KEYWORD1
+on	KEYWORD2
+off	KEYWORD2
+blink	KEYWORD2
+
+
