@@ -16,7 +16,6 @@ class ArtProject {
    ArtProject(Adafruit_NeoPixel strip) ;
    ArtProject(int nrLeds, int pin) ; 
    ~ArtProject();  
-   byte active();  
 
    void  
      rainbow(), 

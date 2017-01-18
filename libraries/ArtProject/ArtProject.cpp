@@ -89,18 +89,6 @@ void ArtProject::lightUp(uint8_t r, uint8_t g, uint8_t b){
 }  
 
 
-// Convert separate R,G,B into packed 32-bit RGB color.
-// Packed format is always RGB, regardless of LED strand color order.
-//uint32_t ArtProject::Color(uint8_t r, uint8_t g, uint8_t b) {
-//  return ((uint32_t)r << 16) | ((uint32_t)g <<  8) | b;
-//}
-
-
-byte ArtProject::active() {   
-   return 1;  
-}  
-
-
 
 
 
