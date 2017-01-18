@@ -49,7 +49,7 @@ void three() {
 } 
 
 void four() { 
- a4.rainbow();
+ a4.rainbowCycle();
 } 
 
 

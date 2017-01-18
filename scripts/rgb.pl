@@ -10,7 +10,8 @@ my $counter = 0;
 while (1) {   
     $counter++;
     for(my $pixelNr=0; $pixelNr < $numPixel ; $pixelNr++) { 
-        print "Pixel Nr: $pixelNr\t:  ";  
+        print "Pixel Nr: $pixelNr\t:  ";   
+        # The binary AND operator assures that all values are in the range of 0 - 255
         Wheel((($pixelNr * 256 / $numPixel) + $counter) &  255) ;
     }
     $counter = 0 if ( $counter > 256 ) ;  

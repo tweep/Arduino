@@ -19,6 +19,7 @@ class ArtProject {
 
    void  
      rainbow(), 
+     rainbowCycle(),
      //colorWipe(uint32_t color),
      lightUp(uint8_t r, uint8_t g, uint8_t b); 
    //static uint32_t 
@@ -29,9 +30,8 @@ class ArtProject {
      uint32_t Wheel(byte WheelPos) ;
      Adafruit_NeoPixel _strip; 
      int 
-       _nrLeds,  
-       _pin, 
-       _counter;
+       _colorIndex,
+       _colorNumber;
 };  
 
 #endif
