@@ -28,7 +28,7 @@ ArtProject::ArtProject(int nrLeds, int pin){
     _strip = Adafruit_NeoPixel(nrLeds, pin, NEO_GRB + NEO_KHZ800);  
     _strip.begin();
     _strip.setBrightness(128); // max 255
-    _strip.show(); // Initialize all pixels to 'off'
+    //_strip.show(); // Initialize all pixels to 'off'
 }  
 
 ArtProject::~ArtProject(){ /* nothing to destruct */ }  
@@ -86,7 +86,6 @@ void ArtProject::rainbow() {
   
   // reset color spectrum again at the beginning of the rainbow.
   if (_colorIndex > 256 ) _colorIndex=0;
-
 }
 
 
