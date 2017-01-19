@@ -8,6 +8,9 @@
                      shows the colors of the rainbow. 
                      
     - rainbowCycle(): lights up the full strand in a single color, 
+                      then moves onto the next color - until all  
+
+    - rainbowCycle(): lights up the full strand in a single color, 
                       then moves onto the next color - until all 
                        
 */ 
@@ -21,43 +24,61 @@
   #include <avr/power.h>
 #endif
 
+/**
+ * Initialize an ArtProject pixel, pin and brightness 
+ * 
+ * @param  (int) Number of LEDs of the strand we like to initialize
+ * @param  (int) PWM pin connected to the strand 
+ * @param  (int) Brightness of the strand 
+ */
 
-// constructor - returns object ArtProject Obj
+
+ArtProject::ArtProject(int nrLeds, int pin, int brightness  ){  
+    _strip = Adafruit_NeoPixel(nrLeds, pin, NEO_GRB + NEO_KHZ800);  
+    _strip.begin();
+   // Bitwise & : a`ssure that value is always between 0 - 255 
+    _strip.setBrightness(brightness & 255 ); 
+}  
+
+/**
+ * Initialize an ArtProject pixel and pin 
+ * 
+ * @param  (int) Number of LEDs of the strand we like to initialize
+ * @param  (int) PWM pin connected to the strand.
+ * Default brightness is 128  
+ */
+
 
 ArtProject::ArtProject(int nrLeds, int pin ){  
     _strip = Adafruit_NeoPixel(nrLeds, pin, NEO_GRB + NEO_KHZ800);  
     _strip.begin();
-    _strip.setBrightness(128); // max 255
+    _strip.setBrightness(128); 
 }  
 
 ArtProject::~ArtProject(){ /* nothing to destruct */ }  
 
-/* 
-   Function   :  rainbowCycle()
-   Description:  Lights a full LED strand in the same color. 
 
-   Note: The bitwise AND operator  (_colorNumber & 255 ) is not 
-   really needed. It assures that the value will always be between 
-   0 - 255. 
-   perl -e 'print 260 & 250' = 4 
 
+
+/**
+ *  Function   :  rainbowCycle()
+ *  Description:  Lights a full LED strand in the same color. 
+ *
+ *  Note: The bitwise AND operator  (_colorNumber & 255 ) is not 
+ *  really needed. It assures that the value will always be between 
+ *  0 - 255. 
+ *  perl -e 'print 260 & 250' = 4 
+ *
 */
-
-
 
 void ArtProject::rainbowCycle() {  
 
-  // loop trough all pixels in the strand
-  // color the full strip in the same color 
-  
-   
   uint32_t currentStripColor = Wheel(_colorNumber & 255);
   
   for(int pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) {
     _strip.setPixelColor(pixelNr, currentStripColor);
   }
   _strip.show();
-  
   _colorNumber++;
   
   // reset color spectrum again at the beginning of the rainbow.
