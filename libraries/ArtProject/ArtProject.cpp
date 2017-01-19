@@ -1,6 +1,12 @@
 /* 
     ArtProject.cpp - a simple library for the Vasily Kadinsky project 
     The functions let an LED strip cycle trough different colors. 
+    
+    Note: New transitions can easily be visualized via JSfiddle: 
+    
+    http://jsfiddle.net/vogelj/6scfhqed/
+    
+    
     Main functions: 
     - rainbow()    : lights up individual pixels of the LED strand 
                      in different colors. The colors "flow" into 
@@ -11,7 +17,13 @@
                       then moves onto the next color - until all  
 
     - rgbBand():      Cycles the strip only trough a part of a given 
-                      RGB spectrum 
+                      RGB spectrum - back and forth 
+                      red ---- green -- purple -- blue 
+                                          ^        ^
+                                          |--BAND--| 
+                       
+    - hsvTransition() Cycles trough the HSV spectrum 
+                      See: http://jsfiddle.net/vogelj/6scfhqed/
                        
 */ 
 
@@ -58,6 +70,33 @@ ArtProject::ArtProject(int nrLeds, int pin ){
 ArtProject::~ArtProject(){ /* nothing to destruct */ }  
 
 
+/** 
+ *   Function  : rgbBand() 
+ *
+ *   Cycles trough a part of an RGB spectrum 
+ *
+ *   _spectrumStart  - set during initialization
+ *   _spectrumEnd    - set during initialization
+ */
+
+void ArtProject::rgbBand() {  
+
+  byte i =1;
+  if ( _colorNumber >= _spectrumEnd )  i = -1;
+  if ( _colorNumber <= _spectrumStart) i = 1;
+
+  Serial.println(_colorNumber);
+
+  uint32_t calcStripColor = Wheel(_colorNumber);
+
+  for(uint16_t pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) {
+    _strip.setPixelColor(pixelNr, calcStripColor);
+  }
+  _strip.show();
+  _colorNumber += i ;
+  _colorNumber = _colorNumber & 255;
+}
+
 
 
 /**
@@ -73,9 +112,11 @@ ArtProject::~ArtProject(){ /* nothing to destruct */ }
 
 void ArtProject::rainbowCycle() {  
 
-  uint32_t currentStripColor = Wheel(_colorNumber & 255);
+  // Computes the next color based on _colorNumber 
   
-  for(int pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) {
+  uint32_t currentStripColor = Wheel(_colorNumber & 255);  // remove &255
+  
+  for(uint8_t pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) {
     _strip.setPixelColor(pixelNr, currentStripColor);
   }
   _strip.show();
@@ -100,7 +141,7 @@ void ArtProject::rainbowCycle() {
 void ArtProject::rainbow() {  
 
   for(int pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) {
-    _strip.setPixelColor(pixelNr, Wheel(((pixelNr * 256 / _strip.numPixels()) + _colorIndex) & 255) );
+    _strip.setPixelColor(pixelNr, Wheel(((pixelNr * 256 / _strip.numPixels()) + _colorIndex) & 255) ); // remove &255
   }
   _strip.show();
   _colorIndex++;
@@ -130,7 +171,7 @@ uint32_t rgbColorConversion(uint8_t r, uint8_t g, uint8_t b) {
 */
 
 uint32_t ArtProject::Wheel(byte WheelPos) {
-  
+  WheelPos = WheelPos & 255; // Avoid we pass any value > 255
   WheelPos = 255 - WheelPos;
   
   if(WheelPos < 85) {
@@ -147,33 +188,15 @@ uint32_t ArtProject::Wheel(byte WheelPos) {
 } 
 
 
-/*
-uint32_t ArtProject::Wheel(byte WheelPos) {
-  
-  WheelPos = 255 - WheelPos;
-  if(WheelPos < 85) {
-    return _strip.Color(255 - WheelPos * 3, 0, WheelPos * 3);
-  }
-  if(WheelPos < 170) {
-    WheelPos -= 85;
-    return _strip.Color(0, WheelPos * 3, 255 - WheelPos * 3);
-  }
-  WheelPos = WheelPos - 170;
-  
-  return _strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
-}
-*/
-
 
 void ArtProject::lightUp(uint8_t r, uint8_t g, uint8_t b){ 
 
   _strip.show(); // Initialize all pixels to 'off'
-  for(uint16_t i=0; i< _strip.numPixels(); i++) {
+  for(uint8_t i=0; i< _strip.numPixels(); i++) {
     _strip.setPixelColor(i, rgbColorConversion(r, g, b)) ;
     _strip.show(); 
     delay(50);
   }
-  //_strip.show(); // Initialize all pixels to 'off'
 }  
 
 

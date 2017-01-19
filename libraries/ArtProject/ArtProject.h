@@ -15,11 +15,13 @@ class ArtProject {
    public: 
    ArtProject(Adafruit_NeoPixel strip) ;
    ArtProject(int nrLeds, int pin) ; 
+   ArtProject(int nrLeds, int pin, int brightness) ; 
    ~ArtProject();  
 
    void  
      rainbow(), 
      rainbowCycle(),
+     rgbBand(),
      //colorWipe(uint32_t color),
      lightUp(uint8_t r, uint8_t g, uint8_t b); 
    //static uint32_t 
@@ -31,7 +33,9 @@ class ArtProject {
      Adafruit_NeoPixel _strip; 
      int 
        _colorIndex,
-       _colorNumber;
+       _colorNumber,
+       _spectrumStart,
+       _spectrumEnd;
 };  
 
 #endif
