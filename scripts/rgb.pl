@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-my $numPixel = 64; 
+my $numPixel = 255; 
 
 my $counter = 0; 
 
