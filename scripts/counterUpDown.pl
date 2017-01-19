@@ -3,14 +3,14 @@
 use strict;
 use warnings; 
 
-my $mod = 5; 
+my $mod = 20; 
 my $operator = "-1"; 
-my $start = 0; 
+my $start = 150; 
 
-for (my $i = 1 ; $i < 20; $i++ ) { 
-
+while(1){
+#for (my $i = 1 ; $i < 20; $i++ ) { 
    $start = getNumber($start,$mod); 
-   print "start $start\n";  
+   print "color: $start\n";  
 }  
 
 

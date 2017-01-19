@@ -10,8 +10,8 @@
     - rainbowCycle(): lights up the full strand in a single color, 
                       then moves onto the next color - until all  
 
-    - rainbowCycle(): lights up the full strand in a single color, 
-                      then moves onto the next color - until all 
+    - rgbBand():      Cycles the strip only trough a part of a given 
+                      RGB spectrum 
                        
 */ 
 
