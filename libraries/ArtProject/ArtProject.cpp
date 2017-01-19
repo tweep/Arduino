@@ -7,14 +7,14 @@
                      the next color. At any time the whole strand 
                      shows the colors of the rainbow. 
                      
-    - rainbowCycle : lights up the full strand in a single color, 
+    - rainbowCycle(): lights up the full strand in a single color, 
                       then moves onto the next color - until all 
                        
 */ 
 
 
 #include "Arduino.h"
-#include "ArtProject.h"       // include the header file declartion 
+#include "ArtProject.h"
 
 #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
@@ -24,18 +24,23 @@
 
 // constructor - returns object ArtProject Obj
 
-ArtProject::ArtProject(int nrLeds, int pin){  
+ArtProject::ArtProject(int nrLeds, int pin ){  
     _strip = Adafruit_NeoPixel(nrLeds, pin, NEO_GRB + NEO_KHZ800);  
     _strip.begin();
     _strip.setBrightness(128); // max 255
-    //_strip.show(); // Initialize all pixels to 'off'
 }  
 
 ArtProject::~ArtProject(){ /* nothing to destruct */ }  
 
 /* 
    Function   :  rainbowCycle()
-   Description:  Lights a full LED strand in the same color.
+   Description:  Lights a full LED strand in the same color. 
+
+   Note: The bitwise AND operator  (_colorNumber & 255 ) is not 
+   really needed. It assures that the value will always be between 
+   0 - 255. 
+   perl -e 'print 260 & 250' = 4 
+
 */
 
 
@@ -45,10 +50,6 @@ void ArtProject::rainbowCycle() {
   // loop trough all pixels in the strand
   // color the full strip in the same color 
   
-  // bitwise AND 
-  // (_colorNumber & 255 ) is not really needed. It assures that the value 
-  // will always be between 0 - 255. 
-  // perl -e 'print 260 & 250' = 4
    
   uint32_t currentStripColor = Wheel(_colorNumber & 255);
   
@@ -81,10 +82,9 @@ void ArtProject::rainbow() {
     _strip.setPixelColor(pixelNr, Wheel(((pixelNr * 256 / _strip.numPixels()) + _colorIndex) & 255) );
   }
   _strip.show();
-  
   _colorIndex++;
   
-  // reset color spectrum again at the beginning of the rainbow.
+  // reset color spectrum once we reach the end of the rainbow ( colors from 0 - 255 ) 
   if (_colorIndex > 256 ) _colorIndex=0;
 }
 
