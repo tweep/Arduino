@@ -13,9 +13,10 @@ class ArtProject {
 
    // Class member variables - initialization  
    public: 
-   ArtProject(Adafruit_NeoPixel strip) ;
-   ArtProject(int nrLeds, int pin) ; 
-   ArtProject(int nrLeds, int pin, int brightness) ; 
+   ArtProject(uint8_t nrLeds, uint8_t pin) ; 
+   ArtProject(uint8_t nrLeds, uint8_t pin, uint8_t brightness) ; 
+   ArtProject(uint8_t nrLeds, uint8_t pin, uint8_t brightness, uint8_t startColor, uint8_t spectrumWidth  ); 
+
    ~ArtProject();  
 
    void  
@@ -31,11 +32,12 @@ class ArtProject {
    private:       
      uint32_t Wheel(byte WheelPos) ;
      Adafruit_NeoPixel _strip; 
-     int 
+     uint8_t 
        _colorIndex,
        _colorNumber,
        _spectrumStart,
-       _spectrumEnd;
+       _spectrumEnd,
+       _var;
 };  
 
 #endif

@@ -36,6 +36,21 @@
   #include <avr/power.h>
 #endif
 
+
+ArtProject::ArtProject(uint8_t nrLeds, uint8_t pin, uint8_t brightness, uint8_t startColor, uint8_t spectrumWidth  ){  
+    _spectrumStart = startColor; 
+    _colorNumber = startColor;
+    _spectrumEnd = startColor + spectrumWidth;
+
+    _strip = Adafruit_NeoPixel(nrLeds, pin, NEO_GRB + NEO_KHZ800);  
+    _strip.begin();
+   // Bitwise & : assure that value is always between 0 - 255 
+    _strip.setBrightness(brightness & 255 ); 
+    
+}  
+
+
+
 /**
  * Initialize an ArtProject pixel, pin and brightness 
  * 
@@ -45,7 +60,7 @@
  */
 
 
-ArtProject::ArtProject(int nrLeds, int pin, int brightness  ){  
+ArtProject::ArtProject(uint8_t nrLeds, uint8_t pin, uint8_t brightness  ){  
     _strip = Adafruit_NeoPixel(nrLeds, pin, NEO_GRB + NEO_KHZ800);  
     _strip.begin();
    // Bitwise & : a`ssure that value is always between 0 - 255 
@@ -61,10 +76,10 @@ ArtProject::ArtProject(int nrLeds, int pin, int brightness  ){
  */
 
 
-ArtProject::ArtProject(int nrLeds, int pin ){  
+ArtProject::ArtProject(uint8_t nrLeds, uint8_t pin ){  
     _strip = Adafruit_NeoPixel(nrLeds, pin, NEO_GRB + NEO_KHZ800);  
     _strip.begin();
-    _strip.setBrightness(128); 
+    _strip.setBrightness(255); 
 }  
 
 ArtProject::~ArtProject(){ /* nothing to destruct */ }  
@@ -79,22 +94,25 @@ ArtProject::~ArtProject(){ /* nothing to destruct */ }
  *   _spectrumEnd    - set during initialization
  */
 
-void ArtProject::rgbBand() {  
 
-  byte i =1;
-  if ( _colorNumber >= _spectrumEnd )  i = -1;
-  if ( _colorNumber <= _spectrumStart) i = 1;
+void ArtProject::rgbBand() {   
 
-  Serial.println(_colorNumber);
+  if ( _colorNumber >= _spectrumEnd ) {  
+     _var = -1;  // ugly - can we do this without a global variable ?
+  }  
+  if ( _colorNumber <= _spectrumStart) { 
+     _var = 1;  // ugly - can we do this without a global variable ?
+  }  
+
+  _colorNumber +=  _var;  
+  _colorNumber = _colorNumber & 255;
 
   uint32_t calcStripColor = Wheel(_colorNumber);
 
-  for(uint16_t pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) {
+  for (uint8_t pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) {
     _strip.setPixelColor(pixelNr, calcStripColor);
   }
   _strip.show();
-  _colorNumber += i ;
-  _colorNumber = _colorNumber & 255;
 }
 
 
@@ -116,7 +134,7 @@ void ArtProject::rainbowCycle() {
   
   uint32_t currentStripColor = Wheel(_colorNumber & 255);  // remove &255
   
-  for(uint8_t pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) {
+  for (uint8_t pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) {
     _strip.setPixelColor(pixelNr, currentStripColor);
   }
   _strip.show();
@@ -140,7 +158,7 @@ void ArtProject::rainbowCycle() {
 
 void ArtProject::rainbow() {  
 
-  for(int pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) {
+  for (uint8_t pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) {
     _strip.setPixelColor(pixelNr, Wheel(((pixelNr * 256 / _strip.numPixels()) + _colorIndex) & 255) ); // remove &255
   }
   _strip.show();
@@ -170,7 +188,7 @@ uint32_t rgbColorConversion(uint8_t r, uint8_t g, uint8_t b) {
                  The colors from 0 - 255 represent a full rainbow.
 */
 
-uint32_t ArtProject::Wheel(byte WheelPos) {
+uint32_t ArtProject::Wheel(byte WheelPos) { 
   WheelPos = WheelPos & 255; // Avoid we pass any value > 255
   WheelPos = 255 - WheelPos;
   
@@ -192,7 +210,7 @@ uint32_t ArtProject::Wheel(byte WheelPos) {
 void ArtProject::lightUp(uint8_t r, uint8_t g, uint8_t b){ 
 
   _strip.show(); // Initialize all pixels to 'off'
-  for(uint8_t i=0; i< _strip.numPixels(); i++) {
+  for (uint8_t i=0; i< _strip.numPixels(); i++) {
     _strip.setPixelColor(i, rgbColorConversion(r, g, b)) ;
     _strip.show(); 
     delay(50);
