@@ -19,7 +19,8 @@ class ArtProject {
 
    ~ArtProject();  
 
-   void  
+   void   
+     percentToRGB(),
      rainbow(), 
      rainbowCycle(),
      rgbBand(),
@@ -35,6 +36,7 @@ class ArtProject {
      uint8_t 
        _colorIndex,
        _colorNumber,
+       _percent,
        _spectrumStart,
        _spectrumEnd,
        _var;
