@@ -1,6 +1,7 @@
 
 #include "ArtProject.h"
 #include "TimedAction.h"
+#include "SpectrumBand.h" // Data type definition for the Spectrum band 
 
 #define PIN4 4
 #define PIN5 5
@@ -27,7 +28,11 @@
 ArtProject a1 = ArtProject(60,4,BRIGHTNESS,210,45);  // problem: function breaks if start + width is > 255. fix this.
 ArtProject a2 = ArtProject(60,PIN5,BRIGHTNESS); 
 ArtProject a3 = ArtProject(60,PIN6,BRIGHTNESS);
-ArtProject a4 = ArtProject(60,PIN7,BRIGHTNESS);
+
+SpectrumBand sb = { 0,100 } ;
+ArtProject a4 = ArtProject(60, PIN7, BRIGHTNESS, sb);
+
+//ArtProject a4 = ArtProject(60,PIN7,BRIGHTNESS);
 
 /*
 TimedAction stripActionOne = TimedAction(10,&one);
@@ -46,7 +51,17 @@ void loop() {
      a1.rgbBand();
      a2.rainbowCycle();
      a3.rainbow();
+
+     // Set the spectrum start and end during runtime ( not during initialization)
+     //a3.setSpectrumStart(10);
+     //a3.setSpectrumEnd(90);
+
+
+     //a4.setSpectrumStart(10);
+     //a4.setSpectrumEnd(100);
      a4.percentToRGB();
+
+     
 
 }
 

@@ -22,7 +22,7 @@
                                           ^        ^
                                           |--BAND--| 
                        
-    - hsvTransition() Cycles trough the HSV spectrum 
+    - percentToRGB() Cycles trough the HSV spectrum (1..100) 
                       See: http://jsfiddle.net/vogelj/6scfhqed/
                        
 */ 
@@ -30,6 +30,7 @@
 
 #include "Arduino.h"
 #include "ArtProject.h"
+#include "SpectrumBand.h"
 
 #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
@@ -37,16 +38,48 @@
 #endif
 
 
-ArtProject::ArtProject(uint8_t nrLeds, uint8_t pin, uint8_t brightness, uint8_t startColor, uint8_t spectrumWidth  ){  
+/**
+ * Initialize an ArtProject with a pectrum band 
+ * 
+ * @param  (int) Number of LEDs of the strand we like to initialize
+ * @param  (int) PWM pin connected to the strand 
+ * @param  (int) Brightness of the strand  
+ * @param  (SpectrumBand) type defintion of a spectrum band 
+ *
+ */
+
+ArtProject::ArtProject(uint8_t nrLeds, uint8_t pin, uint8_t brightness, SpectrumBand specBand ){  
+    // initialize strip 
+    _strip = Adafruit_NeoPixel(nrLeds, pin, NEO_GRB + NEO_KHZ800);  
+    _strip.begin();
+   // Bitwise & : assure that value is always between 0 - 255 
+    _strip.setBrightness(brightness & 255 );  
+
+    // set spectrum values 
+    _spectrumStart = specBand.start; 
+    _spectrumEnd = specBand.start;  
+}
+
+
+/**
+ * Initialize an ArtProject pixel, pin, brightness, spectrum start and spectrum end 
+ * Note: Initalize with Start,End is also possible  
+ * @param  (int) Number of LEDs of the strand we like to initialize
+ * @param  (int) PWM pin connected to the strand 
+ * @param  (int) Brightness of the strand 
+ * @param  (int) Spectrum color start 
+ * @param  (int) Width of the color spectrum 
+ */
+
+ArtProject::ArtProject(uint8_t nrLeds, uint8_t pin, uint8_t brightness, uint8_t startColor, uint8_t endColor){  
     _spectrumStart = startColor; 
     _colorNumber = startColor;
-    _spectrumEnd = startColor + spectrumWidth;
+    _spectrumEnd = endColor;
 
     _strip = Adafruit_NeoPixel(nrLeds, pin, NEO_GRB + NEO_KHZ800);  
     _strip.begin();
    // Bitwise & : assure that value is always between 0 - 255 
     _strip.setBrightness(brightness & 255 ); 
-    
 }  
 
 
@@ -79,10 +112,82 @@ ArtProject::ArtProject(uint8_t nrLeds, uint8_t pin, uint8_t brightness  ){
 ArtProject::ArtProject(uint8_t nrLeds, uint8_t pin ){  
     _strip = Adafruit_NeoPixel(nrLeds, pin, NEO_GRB + NEO_KHZ800);  
     _strip.begin();
+   // Bitwise & : assure that value is always between 0 - 255 
     _strip.setBrightness(255); 
 }  
 
 ArtProject::~ArtProject(){ /* nothing to destruct */ }  
+
+
+
+/* 
+   Function   :  rgbColorConversion(int, int, int) 
+   Description:  Converts 3 integers into a single integer which 
+                 represents a color.
+*/
+
+uint32_t rgbColorConversion(uint8_t r, uint8_t g, uint8_t b) {
+  return ((uint32_t)r << 16) | ((uint32_t)g <<  8) | b;
+} 
+
+
+
+/** 
+ *   Function  : percentToRGB() 
+ *   Note: This function requires that spec
+ *   Converts a number between 0 and 100 into a color 
+ *   0   - green 
+ *   50  - yellow 
+ *   100 - red  
+ * 
+ */
+
+
+
+
+void ArtProject::percentToRGB() {   
+  uint8_t r, g, b;   
+
+  // init: _colorNumber = _spectrumStart 
+
+  // Make sure that this spectrum is between 0 and 100 
+  if ( _spectrumEnd - _spectrumStart > 100 ) {
+     _spectrumStart = 100 - _spectrumStart; 
+  }
+
+  if ( _colorNumber >= _spectrumEnd ) {  
+     _var = -1;  // ugly - can we do this without a global variable ?
+  }  
+  if ( _colorNumber <= _spectrumStart) { 
+     _var = 1;  // ugly - can we do this without a global variable ?
+  }  
+
+  _colorNumber +=  _var;  
+
+   // Compute the RGB color from an HSV percentage.
+
+
+   if (_colorNumber < 50) {
+        // green to yellow
+        r = (uint8_t) (255 * (_colorNumber / 50));
+        g = 255;
+
+    } else {
+        // yellow to red
+        r = 255;
+        g = (uint8_t)(255 * ((50 - _colorNumber % 50) / 50));
+    }
+    b = 0;
+  
+    uint32_t calcStripColor = rgbColorConversion(r, g, b);
+
+    Serial.println(calcStripColor); 
+
+   for (uint8_t pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) {
+     _strip.setPixelColor(pixelNr, calcStripColor);
+   }
+   _strip.show();
+}
 
 
 /** 
@@ -107,7 +212,7 @@ void ArtProject::rgbBand() {
   _colorNumber +=  _var;  
   _colorNumber = _colorNumber & 255;
 
-  uint32_t calcStripColor = Wheel(_colorNumber);
+  uint32_t calcStripColor = colorWheel(_colorNumber);
 
   for (uint8_t pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) {
     _strip.setPixelColor(pixelNr, calcStripColor);
@@ -132,7 +237,7 @@ void ArtProject::rainbowCycle() {
 
   // Computes the next color based on _colorNumber 
   
-  uint32_t currentStripColor = Wheel(_colorNumber & 255);  // remove &255
+  uint32_t currentStripColor = colorWheel(_colorNumber & 255);  // remove &255
   
   for (uint8_t pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) {
     _strip.setPixelColor(pixelNr, currentStripColor);
@@ -141,7 +246,7 @@ void ArtProject::rainbowCycle() {
   _colorNumber++;
   
   // reset color spectrum again at the beginning of the rainbow.
-  if (_colorNumber > 256 ) _colorNumber=0;
+  if (_colorNumber >= 255 ) _colorNumber=0;
 }
 
 
@@ -159,36 +264,27 @@ void ArtProject::rainbowCycle() {
 void ArtProject::rainbow() {  
 
   for (uint8_t pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) {
-    _strip.setPixelColor(pixelNr, Wheel(((pixelNr * 256 / _strip.numPixels()) + _colorIndex) & 255) ); // remove &255
+    _strip.setPixelColor(pixelNr, colorWheel(((pixelNr * 256 / _strip.numPixels()) + _colorNumber) & 255) ); // remove &255
   }
   _strip.show();
-  _colorIndex++;
+  _colorNumber++;
   
   // reset color spectrum once we reach the end of the rainbow ( colors from 0 - 255 ) 
-  if (_colorIndex > 256 ) _colorIndex=0;
+  if (_colorNumber >= 255 ) {
+    _colorNumber = 0;
+  }
 }
 
 
-/* 
-   Function   :  rgbColorConversion(int, int, int) 
-   Description:  Converts 3 integers into a single integer which 
-                 represents a color.
-*/
-
-uint32_t rgbColorConversion(uint8_t r, uint8_t g, uint8_t b) {
-  return ((uint32_t)r << 16) | ((uint32_t)g <<  8) | b;
-} 
-
-
 
 
 /* 
-   Function   :  Wheel(int 0 - 255 )
+   Function   :  colorWheel(int 0 - 255 )
    Description:  Converts an integer into a color, represented by R,G,B values.
                  The colors from 0 - 255 represent a full rainbow.
 */
 
-uint32_t ArtProject::Wheel(byte WheelPos) { 
+uint32_t ArtProject::colorWheel(byte WheelPos) { 
   WheelPos = WheelPos & 255; // Avoid we pass any value > 255
   WheelPos = 255 - WheelPos;
   
@@ -209,7 +305,8 @@ uint32_t ArtProject::Wheel(byte WheelPos) {
 
 void ArtProject::lightUp(uint8_t r, uint8_t g, uint8_t b){ 
 
-  _strip.show(); // Initialize all pixels to 'off'
+  _strip.show(); // Initialize all pixels to 'off' 
+
   for (uint8_t i=0; i< _strip.numPixels(); i++) {
     _strip.setPixelColor(i, rgbColorConversion(r, g, b)) ;
     _strip.show(); 
@@ -218,6 +315,21 @@ void ArtProject::lightUp(uint8_t r, uint8_t g, uint8_t b){
 }  
 
 
+// Set the spectrum start 
+
+void ArtProject::setSpectrumStart(uint8_t s) {  
+   _spectrumStart = s;  
+}  
+
+// Set the spectrum end 
+
+void ArtProject::setSpectrumEnd(uint8_t e) {  
+   _spectrumEnd = e; 
+} 
 
 
 
+void ArtProject::setSpectrum(uint8_t s, uint8_t e) {  
+   _spectrumStart = s;  
+   _spectrumEnd = e;  
+}  
