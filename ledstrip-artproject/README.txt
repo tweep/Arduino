@@ -9,3 +9,4 @@ https://blog.asmartbear.com/color-wheels.html
 http://rileyjshaw.com/blog/hue-angle-transitions/
 
 
+A color transition in JSfiddle: https://jsfiddle.net/user/vogelj/ 
