@@ -3,21 +3,20 @@
 use strict;
 use warnings; 
 
-my $mod = 20; 
+my $index_max = 100;           # range 
 my $operator = "-1"; 
-my $start = 150; 
+my $index_start = 0;        # start index  ( A start of 20 with a range=5 goes from 20,21,22,23,24, 25 ,24,23...
 
 while(1){
-#for (my $i = 1 ; $i < 20; $i++ ) { 
-   $start = getNumber($start,$mod); 
-   print "color: $start\n";  
+   $index_start = getNumber($index_start,$index_max); 
+   print "color: $index_start\n";  
 }  
 
 
 sub getNumber{  
-  my ($number, $mod) = @_; 
+  my ($number, $index_max) = @_; 
 
-  if ( $number % $mod == 0 ) {  
+  if ( $number % $index_max == 0 ) {  
      $operator = $operator * -1; 
   }  
   $number = $number + $operator;
