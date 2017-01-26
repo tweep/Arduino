@@ -165,8 +165,8 @@ void ArtProject::percentToRGB() {
   _colorNumber +=  _var;  
 
    // Compute the RGB color from an HSV percentage.
-
-
+   // note: moved to hsvToRGBconversion(percentage)  
+   // RM ---   / also remove the delcaration of r,g and b up top of the function 
    if (_colorNumber < 50) {
         // green to yellow
         r = (uint8_t) (255 * (_colorNumber / 50));
@@ -178,9 +178,13 @@ void ArtProject::percentToRGB() {
         g = (uint8_t)(255 * ((50 - _colorNumber % 50) / 50));
     }
     b = 0;
-  
+ 
+    // RM ---  
+    // NOW:  
     uint32_t calcStripColor = rgbColorConversion(r, g, b);
 
+   // Later after testing: 
+   // uint32_t calcStripColor = hsvToRGBconversion(_colorNumber); 
     Serial.println(calcStripColor); 
 
    for (uint8_t pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) {
@@ -301,6 +305,40 @@ uint32_t ArtProject::colorWheel(byte WheelPos) {
   return rgbColorConversion(WheelPos * 3, 255 - WheelPos * 3, 0);
 } 
 
+/*
+ * Function   : hsvToRGBconversion( int 0 .. 100 ) 
+ * Description: Converts an HSV percentage value ( integer between 0 .. 100 ) 
+ *              into an RGB color.
+ *              the HSV transition cycles from green over yellow to red. 
+ *              (no purple or blue colors are used ) 
+ *
+ */ 
+
+uint32_t ArtProject::hsvToRGBconversion(byte percent ) { 
+   uint8_t r, g, b; 
+
+   if (percent < 50) {
+        // green to yellow
+        r = (uint8_t) (255 * (percent / 50));
+        g = 255;
+
+    } else {
+        // yellow to red
+        r = 255;
+        g = (uint8_t)(255 * ((50 - percent % 50) / 50));
+    }
+    b = 0;
+  
+    uint32_t rgbColorEquivalent = rgbColorConversion(r, g, b);
+    return rgbColorEquivalent; 
+}
+
+/*
+ * Function   : lightUp(r, g, b); 
+ * Description: Lights the LED strip up in a specified RGB color, 
+ *              one pixel after the other. 
+ *
+*/
 
 
 void ArtProject::lightUp(uint8_t r, uint8_t g, uint8_t b){ 

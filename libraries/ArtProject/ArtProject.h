@@ -39,8 +39,12 @@ class ArtProject {
 
 
    private:       
-     uint32_t colorWheel(byte WheelPos) ;
-     Adafruit_NeoPixel _strip; 
+     uint32_t 
+       colorWheel(byte WheelPos), 
+       hsvToRGBconversion(byte percent); 
+
+     Adafruit_NeoPixel _strip;  
+
      uint8_t 
        _colorNumber,                  // 8 bit color number; with values between 0 - 255 (depending on the transition it can also be 0-99) 
        _spectrumStart,                // Start of the color spectrum band 

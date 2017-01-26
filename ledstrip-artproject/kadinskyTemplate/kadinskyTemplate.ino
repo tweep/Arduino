@@ -61,8 +61,6 @@ void loop() {
      //a4.setSpectrumEnd(100);
      a4.percentToRGB();
 
-     
-
 }
 
 
