@@ -46,6 +46,7 @@ void loop() {
      a1.rgbBand();
      a2.rainbowCycle();
      a3.rainbow();
+     a4.percentToRGB();
 
 }
 
