@@ -25,11 +25,11 @@
  *                                     - for every loop, ?
  *  - now move the colors by 1 pixel : 
   */
-ArtProject a1 = ArtProject(60,4,BRIGHTNESS,210,45);  // problem: function breaks if start + width is > 255. fix this.
+ArtProject a1 = ArtProject(60,4,BRIGHTNESS,100,150);  // problem: function breaks if start + width is > 255. fix this.
 ArtProject a2 = ArtProject(60,PIN5,BRIGHTNESS); 
 ArtProject a3 = ArtProject(60,PIN6,BRIGHTNESS);
 
-SpectrumBand sb = { 0,100 } ;
+SpectrumBand sb = { 1,99 } ;
 ArtProject a4 = ArtProject(60, PIN7, BRIGHTNESS, sb);
 
 //ArtProject a4 = ArtProject(60,PIN7,BRIGHTNESS);
@@ -48,9 +48,9 @@ void setup() {
 void loop() {
     Serial.println("loop()"); 
 
-     a1.rgbBand();
-     a2.rainbowCycle();
-     a3.rainbow();
+    // a1.rgbBand();
+    // a2.rainbowCycle();
+    // a3.rainbow();
 
      // Set the spectrum start and end during runtime ( not during initialization)
      //a3.setSpectrumStart(10);
@@ -59,7 +59,7 @@ void loop() {
 
      //a4.setSpectrumStart(10);
      //a4.setSpectrumEnd(100);
-     a4.percentToRGB();
+      a4.percentToRGB();
 
 }
 

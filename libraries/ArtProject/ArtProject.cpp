@@ -21,7 +21,7 @@
                       red ---- green -- purple -- blue 
                                           ^        ^
                                           |--BAND--| 
-                      
+                                        start     end
 
     - hsvCycle()   
     - percentToRGB() Cycles trough the HSV spectrum (1..100)   
@@ -60,10 +60,10 @@ ArtProject::ArtProject(uint8_t nrLeds, uint8_t pin, uint8_t brightness, Spectrum
     _strip.begin();
    // Bitwise & : assure that value is always between 0 - 255 
     _strip.setBrightness(brightness & 255 );  
-
+   
     // set spectrum values 
     _spectrumStart = specBand.start; 
-    _spectrumEnd = specBand.start;  
+    _spectrumEnd = specBand.end;  
 }
 
 
@@ -77,7 +77,14 @@ ArtProject::ArtProject(uint8_t nrLeds, uint8_t pin, uint8_t brightness, Spectrum
  * @param  (int) Width of the color spectrum 
  */
 
-ArtProject::ArtProject(uint8_t nrLeds, uint8_t pin, uint8_t brightness, uint8_t startColor, uint8_t endColor){  
+ArtProject::ArtProject(uint8_t nrLeds, uint8_t pin, uint8_t brightness, uint8_t startColor, uint8_t endColor){    
+    // check data 
+    if ( startColor < 0 || startColor > endColor ) {  
+        startColor = 0; 
+    }
+    if (endColor < startColor) {  
+       endColor = 100;
+    }  
     _spectrumStart = startColor; 
     _colorNumber = startColor;
     _spectrumEnd = endColor;
@@ -126,6 +133,41 @@ ArtProject::~ArtProject(){ /* nothing to destruct */ }
 
 
 
+/**
+ * Calculates the next color number - and walks trough the 
+ * spectrum up and down like a sinus function. 
+ * 
+ * @param  (int) Number of LEDs of the strand we like to initialize
+ * @param  (int) PWM pin connected to the strand.
+ * Default brightness is 128  
+ */
+
+
+void ArtProject::setNextColorNumber() {     
+
+  if ( _colorNumber >= _spectrumEnd ) {  
+     _var = -1;  // ugly - can we do this without a global variable ?
+  }  
+  if ( _colorNumber <= _spectrumStart) { 
+     _var = 1;  // ugly - can we do this without a global variable ?
+  }  
+  _colorNumber +=  _var;  
+} 
+
+
+
+uint8_t ArtProject::setNextColorNumber(uint8_t color) {     
+
+  if ( color >= _spectrumEnd ) {  
+     _var = -1;  // ugly - can we do this without a global variable ?
+  }  
+  if ( color <= _spectrumStart) { 
+     _var = 1;  // ugly - can we do this without a global variable ?
+  }  
+  color +=  _var;  
+  return color; 
+} 
+
 /* 
    Function   :  rgbColorConversion(int, int, int) 
    Description:  Converts 3 integers into a single integer which 
@@ -152,7 +194,6 @@ uint32_t rgbColorConversion(uint8_t r, uint8_t g, uint8_t b) {
  */
 
 
-
 // Find better name: 
 void ArtProject::percentToRGB() {   
   uint8_t r, g, b;   
@@ -160,12 +201,10 @@ void ArtProject::percentToRGB() {
   // init: _colorNumber = _spectrumStart 
 
   // Make sure that this spectrum is between 0 and 100  
-  if ( _spectrumEnd - _spectrumStart > 100 ) {
-     _spectrumStart = 100 - _spectrumStart; 
-  }
-
-
-  // xxx 
+//  if ( _spectrumEnd - _spectrumStart > 100 ) {
+ //    _spectrumStart = 100 - _spectrumStart; 
+  //}
+/*
   if ( _colorNumber >= _spectrumEnd ) {  
      _var = -1;  // ugly - can we do this without a global variable ?
   }  
@@ -174,10 +213,14 @@ void ArtProject::percentToRGB() {
   }  
 
   _colorNumber +=  _var;  
+*/
+//  _colorNumber = setNextColorNumber(_colorNumber); 
+
 
    // Compute the RGB color from an HSV percentage.
    // note: moved to hsvToRGBconversion(percentage)  
-   // RM ---   / also remove the delcaration of r,g and b up top of the function 
+   // RM ---   / also remove the delcaration of r,g and b up top of the function  
+/*
    if (_colorNumber < 50) {
         // green to yellow
         r = (uint8_t) (255 * (_colorNumber / 50));
@@ -193,15 +236,16 @@ void ArtProject::percentToRGB() {
     // RM ---  
     // NOW:  
     uint32_t calcStripColor = rgbColorConversion(r, g, b);
-
+*/
    // Later after testing: 
-   // uint32_t calcStripColor = hsvToRGBconversion(_colorNumber); 
-    Serial.println(calcStripColor); 
+    uint32_t calcStripColor = hsvToRGBconversion(_colorNumber); 
 
    for (uint8_t pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) {
      _strip.setPixelColor(pixelNr, calcStripColor);
    }
-   _strip.show();
+   _strip.show(); 
+
+    setNextColorNumber(); 
 }
 
 
@@ -244,15 +288,17 @@ void ArtProject::hsvbow() {
 
 
 void ArtProject::rgbBand() {   
-   // xxx 
+   // xxx  
+/* 
   if ( _colorNumber >= _spectrumEnd ) {  
      _var = -1;  // ugly - can we do this without a global variable ?
   }  
   if ( _colorNumber <= _spectrumStart) { 
      _var = 1;  // ugly - can we do this without a global variable ?
   }  
-  _colorNumber +=  _var;  
-
+  _colorNumber +=  _var;   
+*/
+  setNextColorNumber(); 
 
   _colorNumber = _colorNumber & 255;
 
@@ -355,20 +401,20 @@ uint32_t ArtProject::colorWheel(byte WheelPos) {
  */ 
 
 uint32_t ArtProject::hsvToRGBconversion(byte percent ) { 
-   uint8_t r, g, b; 
+   uint8_t r, g, b;  
 
    if (percent < 50) {
         // green to yellow
-        r = (uint8_t) (255 * (percent / 50));
+        r = (uint8_t)(255 * (percent / 50.0)); 
         g = 255;
 
     } else {
         // yellow to red
         r = 255;
-        g = (uint8_t)(255 * ((50 - percent % 50) / 50));
+        g = (uint8_t)(255 * ((50 - percent % 50) / 50.0));
     }
-    b = 0;
-  
+    b = 0; 
+
     uint32_t rgbColorEquivalent = rgbColorConversion(r, g, b);
     return rgbColorEquivalent; 
 }

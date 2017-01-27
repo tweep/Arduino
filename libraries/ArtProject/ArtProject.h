@@ -30,7 +30,8 @@ class ArtProject {
      rainbow(), 
      rainbowCycle(),
      rgbBand(),
-     lightUp(uint8_t r, uint8_t g, uint8_t b),
+     lightUp(uint8_t r, uint8_t g, uint8_t b), 
+     setNextColorNumber(),
      setSpectrumStart(uint8_t start), 
      setSpectrumEnd(uint8_t end), 
      setSpectrum(uint8_t start,uint8_t end) ; 
@@ -40,6 +41,8 @@ class ArtProject {
 
 
    private:       
+     uint8_t setNextColorNumber(uint8_t c);  
+
      uint32_t 
        colorWheel(byte WheelPos), 
        hsvToRGBconversion(byte percent); 
