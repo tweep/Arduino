@@ -25,7 +25,8 @@ class ArtProject {
    ~ArtProject();  
 
    void   
-     percentToRGB(),
+     percentToRGB(), 
+     hsvbow(),
      rainbow(), 
      rainbowCycle(),
      rgbBand(),

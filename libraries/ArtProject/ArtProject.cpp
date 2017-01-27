@@ -21,8 +21,14 @@
                       red ---- green -- purple -- blue 
                                           ^        ^
                                           |--BAND--| 
-                       
-    - percentToRGB() Cycles trough the HSV spectrum (1..100) 
+                      
+
+    - hsvCycle()   
+    - percentToRGB() Cycles trough the HSV spectrum (1..100)   
+                      The full strad will be lit in a single color, and transition 
+                      together trough the spectrum 
+                      SpectrumStart and SpectrumEnd have to be set before, 
+                      trough constructonr or setSpectrumStart/End methods.  
                       See: http://jsfiddle.net/vogelj/6scfhqed/
                        
 */ 
@@ -134,6 +140,9 @@ uint32_t rgbColorConversion(uint8_t r, uint8_t g, uint8_t b) {
 
 /** 
  *   Function  : percentToRGB() 
+  *  Description:  Lights a full LED strand IN THE SAME color
+                   and transitions the full strand trough the HSV spectrum 
+                   (from green --> yellow --> red ) and back. 
  *   Note: This function requires that spec
  *   Converts a number between 0 and 100 into a color 
  *   0   - green 
@@ -144,17 +153,19 @@ uint32_t rgbColorConversion(uint8_t r, uint8_t g, uint8_t b) {
 
 
 
-
+// Find better name: 
 void ArtProject::percentToRGB() {   
   uint8_t r, g, b;   
 
   // init: _colorNumber = _spectrumStart 
 
-  // Make sure that this spectrum is between 0 and 100 
+  // Make sure that this spectrum is between 0 and 100  
   if ( _spectrumEnd - _spectrumStart > 100 ) {
      _spectrumStart = 100 - _spectrumStart; 
   }
 
+
+  // xxx 
   if ( _colorNumber >= _spectrumEnd ) {  
      _var = -1;  // ugly - can we do this without a global variable ?
   }  
@@ -194,6 +205,34 @@ void ArtProject::percentToRGB() {
 }
 
 
+/* 
+   Function   :  hsvbow() 
+   Description:  Colors individual pixels of an LED strand individually, 
+                 The full strand will show at any time the 255 colors of the 
+                 HSV spectrum ( 0 - 100 percent) 
+                 On each call, the color of a pixel blends into the next color.
+                  
+*/
+
+
+void ArtProject::hsvbow() {  
+
+  for (uint8_t pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) { 
+    // normalize to pixel number ? 
+    _strip.setPixelColor(pixelNr, hsvToRGBconversion( (pixelNr * 100  / _strip.numPixels()) + _colorNumber) ); // remove &255
+   // _strip.setPixelColor(pixelNr, hsvToRGBconversion colorWheel(((pixelNr * 256 / _strip.numPixels()) + _colorNumber) & 255) ); // remove &255
+  }
+  _strip.show();
+  _colorNumber++;
+ 
+  // cycle forward and back / up and down here.  
+  // reset color spectrum once we reach the end of the rainbow ( colors from 0 - 255 ) 
+  if (_colorNumber >= 100 ) {
+    _colorNumber = 0;
+  }
+}
+
+
 /** 
  *   Function  : rgbBand() 
  *
@@ -205,15 +244,16 @@ void ArtProject::percentToRGB() {
 
 
 void ArtProject::rgbBand() {   
-
+   // xxx 
   if ( _colorNumber >= _spectrumEnd ) {  
      _var = -1;  // ugly - can we do this without a global variable ?
   }  
   if ( _colorNumber <= _spectrumStart) { 
      _var = 1;  // ugly - can we do this without a global variable ?
   }  
-
   _colorNumber +=  _var;  
+
+
   _colorNumber = _colorNumber & 255;
 
   uint32_t calcStripColor = colorWheel(_colorNumber);
@@ -228,7 +268,7 @@ void ArtProject::rgbBand() {
 
 /**
  *  Function   :  rainbowCycle()
- *  Description:  Lights a full LED strand in the same color. 
+ *  Description:  Lights a full LED strand IN THE SAME color. 
  *
  *  Note: The bitwise AND operator  (_colorNumber & 255 ) is not 
  *  really needed. It assures that the value will always be between 
@@ -241,10 +281,10 @@ void ArtProject::rainbowCycle() {
 
   // Computes the next color based on _colorNumber 
   
-  uint32_t currentStripColor = colorWheel(_colorNumber & 255);  // remove &255
+  uint32_t nextStripColor = colorWheel(_colorNumber & 255);  // remove &255
   
   for (uint8_t pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) {
-    _strip.setPixelColor(pixelNr, currentStripColor);
+    _strip.setPixelColor(pixelNr, nextStripColor);
   }
   _strip.show();
   _colorNumber++;
