@@ -1,4 +1,6 @@
 
+// Use an array data structure to initliaze multiple buttons 
+
 byte button[] = {52,50,48,46}; 
 
 void setup() {
