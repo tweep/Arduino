@@ -42,6 +42,18 @@ TimedAction stripActionFour = TimedAction(160,&four);
 void setup() {
   Serial.begin(9600);
   Serial.println("in setup()"); 
+  a1.init();
+  a2.init();
+  a3.init();
+  a4.init();
+  
+  a1.lightUp(255,0,0);
+  a2.lightUp(255,0,255);
+  a3.lightUp(255,255,0);
+  a2.lightUp(255,0,0);
+
+
+
 }
 
 void loop() {

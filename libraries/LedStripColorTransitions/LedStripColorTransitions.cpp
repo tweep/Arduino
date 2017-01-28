@@ -126,7 +126,7 @@ LedStripColorTransitions::LedStripColorTransitions(uint8_t nrLeds, uint8_t pin )
     _strip = Adafruit_NeoPixel(nrLeds, pin, NEO_GRB + NEO_KHZ800);  
     _strip.begin();
    // Bitwise & : assure that value is always between 0 - 255 
-    _strip.setBrightness(255); 
+    //_strip.setBrightness(255); 
 }  
 
 LedStripColorTransitions::~LedStripColorTransitions(){ /* nothing to destruct */ }  
@@ -360,6 +360,12 @@ uint32_t LedStripColorTransitions::hsvToRGBconversion(byte percent ) {
 
     uint32_t rgbColorEquivalent = rgbColorConversion(r, g, b);
     return rgbColorEquivalent; 
+} 
+
+
+void LedStripColorTransitions::init(){  
+  _strip.begin();
+  _strip.show();
 }
 
 /*
@@ -372,12 +378,14 @@ uint32_t LedStripColorTransitions::hsvToRGBconversion(byte percent ) {
 
 void LedStripColorTransitions::lightUp(uint8_t r, uint8_t g, uint8_t b){ 
 
-  _strip.show(); // Initialize all pixels to 'off' 
-
-  for (uint8_t i=0; i< _strip.numPixels(); i++) {
+//  _strip.show(); // Initialize all pixels to 'off' 
+ // _strip.begin();
+  //init();
+  for (uint8_t i = 0; i< _strip.numPixels(); i++) {
     _strip.setPixelColor(i, rgbColorConversion(r, g, b)) ;
-    _strip.show(); 
+    Serial.println(i);
     delay(50);
+    _strip.show();  
   }
 }  
 

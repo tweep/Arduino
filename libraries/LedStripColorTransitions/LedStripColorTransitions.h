@@ -25,8 +25,9 @@ class LedStripColorTransitions {
    ~LedStripColorTransitions();  
 
    void   
-     percentToRGB(), 
+     init(),
      hsvbow(),
+     percentToRGB(), 
      rainbow(), 
      rainbowCycle(),
      rgbBand(),
@@ -36,7 +37,7 @@ class LedStripColorTransitions {
      setSpectrumEnd(uint8_t end), 
      setSpectrum(uint8_t start,uint8_t end) ; 
      //colorWipe(uint32_t color),
-   //static uint32_t 
+    //static uint32_t 
     // Color(uint8_t r, uint8_t g, uint8_t b);
 
 
