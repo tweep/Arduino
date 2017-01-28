@@ -1,0 +1,30 @@
+
+- x.setup() - setup the pins (input and output) 
+- x.attract_mode() 
+
+- common routines between games: 
+  - winner() 
+  - looser() 
+  - next_level() 
+  - score() 
+
+- game.init()  
+    - hand over array of leds 
+    - hand over array of sensors 
+
+- game.play()
+    - set_level() 
+      nr_leds to light up 
+      led_ms() to turn on 
+        
+    - hand over array of sensors 
+
+
+
+    - move to next level() 
+
+- start - hand over sensors (input and output devices) 
+
+
+- how to implement different games ? 
+  different games have the same sensors - they will hae different levels 
