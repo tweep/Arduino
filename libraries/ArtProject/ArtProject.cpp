@@ -21,8 +21,14 @@
                       red ---- green -- purple -- blue 
                                           ^        ^
                                           |--BAND--| 
-                       
-    - percentToRGB() Cycles trough the HSV spectrum (1..100) 
+                                        start     end
+
+    - hsvCycle()   
+    - percentToRGB() Cycles trough the HSV spectrum (1..100)   
+                      The full strad will be lit in a single color, and transition 
+                      together trough the spectrum 
+                      SpectrumStart and SpectrumEnd have to be set before, 
+                      trough constructonr or setSpectrumStart/End methods.  
                       See: http://jsfiddle.net/vogelj/6scfhqed/
                        
 */ 
@@ -54,10 +60,10 @@ ArtProject::ArtProject(uint8_t nrLeds, uint8_t pin, uint8_t brightness, Spectrum
     _strip.begin();
    // Bitwise & : assure that value is always between 0 - 255 
     _strip.setBrightness(brightness & 255 );  
-
+   
     // set spectrum values 
     _spectrumStart = specBand.start; 
-    _spectrumEnd = specBand.start;  
+    _spectrumEnd = specBand.end;  
 }
 
 
@@ -71,7 +77,14 @@ ArtProject::ArtProject(uint8_t nrLeds, uint8_t pin, uint8_t brightness, Spectrum
  * @param  (int) Width of the color spectrum 
  */
 
-ArtProject::ArtProject(uint8_t nrLeds, uint8_t pin, uint8_t brightness, uint8_t startColor, uint8_t endColor){  
+ArtProject::ArtProject(uint8_t nrLeds, uint8_t pin, uint8_t brightness, uint8_t startColor, uint8_t endColor){    
+    // check data 
+    if ( startColor < 0 || startColor > endColor ) {  
+        startColor = 0; 
+    }
+    if (endColor < startColor) {  
+       endColor = 100;
+    }  
     _spectrumStart = startColor; 
     _colorNumber = startColor;
     _spectrumEnd = endColor;
@@ -120,6 +133,41 @@ ArtProject::~ArtProject(){ /* nothing to destruct */ }
 
 
 
+/**
+ * Calculates the next color number - and walks trough the 
+ * spectrum up and down like a sinus function. 
+ * 
+ * @param  (int) Number of LEDs of the strand we like to initialize
+ * @param  (int) PWM pin connected to the strand.
+ * Default brightness is 128  
+ */
+
+
+void ArtProject::setNextColorNumber() {     
+
+  if ( _colorNumber >= _spectrumEnd ) {  
+     _var = -1;  // ugly - can we do this without a global variable ?
+  }  
+  if ( _colorNumber <= _spectrumStart) { 
+     _var = 1;  // ugly - can we do this without a global variable ?
+  }  
+  _colorNumber +=  _var;  
+} 
+
+
+
+uint8_t ArtProject::setNextColorNumber(uint8_t color) {     
+
+  if ( color >= _spectrumEnd ) {  
+     _var = -1;  // ugly - can we do this without a global variable ?
+  }  
+  if ( color <= _spectrumStart) { 
+     _var = 1;  // ugly - can we do this without a global variable ?
+  }  
+  color +=  _var;  
+  return color; 
+} 
+
 /* 
    Function   :  rgbColorConversion(int, int, int) 
    Description:  Converts 3 integers into a single integer which 
@@ -134,6 +182,9 @@ uint32_t rgbColorConversion(uint8_t r, uint8_t g, uint8_t b) {
 
 /** 
  *   Function  : percentToRGB() 
+  *  Description:  Lights a full LED strand IN THE SAME color
+                   and transitions the full strand trough the HSV spectrum 
+                   (from green --> yellow --> red ) and back. 
  *   Note: This function requires that spec
  *   Converts a number between 0 and 100 into a color 
  *   0   - green 
@@ -143,18 +194,17 @@ uint32_t rgbColorConversion(uint8_t r, uint8_t g, uint8_t b) {
  */
 
 
-
-
+// Find better name: 
 void ArtProject::percentToRGB() {   
   uint8_t r, g, b;   
 
   // init: _colorNumber = _spectrumStart 
 
-  // Make sure that this spectrum is between 0 and 100 
-  if ( _spectrumEnd - _spectrumStart > 100 ) {
-     _spectrumStart = 100 - _spectrumStart; 
-  }
-
+  // Make sure that this spectrum is between 0 and 100  
+//  if ( _spectrumEnd - _spectrumStart > 100 ) {
+ //    _spectrumStart = 100 - _spectrumStart; 
+  //}
+/*
   if ( _colorNumber >= _spectrumEnd ) {  
      _var = -1;  // ugly - can we do this without a global variable ?
   }  
@@ -163,10 +213,14 @@ void ArtProject::percentToRGB() {
   }  
 
   _colorNumber +=  _var;  
+*/
+//  _colorNumber = setNextColorNumber(_colorNumber); 
+
 
    // Compute the RGB color from an HSV percentage.
-
-
+   // note: moved to hsvToRGBconversion(percentage)  
+   // RM ---   / also remove the delcaration of r,g and b up top of the function  
+/*
    if (_colorNumber < 50) {
         // green to yellow
         r = (uint8_t) (255 * (_colorNumber / 50));
@@ -178,15 +232,48 @@ void ArtProject::percentToRGB() {
         g = (uint8_t)(255 * ((50 - _colorNumber % 50) / 50));
     }
     b = 0;
-  
+ 
+    // RM ---  
+    // NOW:  
     uint32_t calcStripColor = rgbColorConversion(r, g, b);
-
-    Serial.println(calcStripColor); 
+*/
+   // Later after testing: 
+    uint32_t calcStripColor = hsvToRGBconversion(_colorNumber); 
 
    for (uint8_t pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) {
      _strip.setPixelColor(pixelNr, calcStripColor);
    }
-   _strip.show();
+   _strip.show(); 
+
+    setNextColorNumber(); 
+}
+
+
+/* 
+   Function   :  hsvbow() 
+   Description:  Colors individual pixels of an LED strand individually, 
+                 The full strand will show at any time the 255 colors of the 
+                 HSV spectrum ( 0 - 100 percent) 
+                 On each call, the color of a pixel blends into the next color.
+                  
+*/
+
+
+void ArtProject::hsvbow() {  
+
+  for (uint8_t pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) { 
+    // normalize to pixel number ? 
+    _strip.setPixelColor(pixelNr, hsvToRGBconversion( (pixelNr * 100  / _strip.numPixels()) + _colorNumber) ); // remove &255
+   // _strip.setPixelColor(pixelNr, hsvToRGBconversion colorWheel(((pixelNr * 256 / _strip.numPixels()) + _colorNumber) & 255) ); // remove &255
+  }
+  _strip.show();
+  _colorNumber++;
+ 
+  // cycle forward and back / up and down here.  
+  // reset color spectrum once we reach the end of the rainbow ( colors from 0 - 255 ) 
+  if (_colorNumber >= 100 ) {
+    _colorNumber = 0;
+  }
 }
 
 
@@ -201,15 +288,18 @@ void ArtProject::percentToRGB() {
 
 
 void ArtProject::rgbBand() {   
-
+   // xxx  
+/* 
   if ( _colorNumber >= _spectrumEnd ) {  
      _var = -1;  // ugly - can we do this without a global variable ?
   }  
   if ( _colorNumber <= _spectrumStart) { 
      _var = 1;  // ugly - can we do this without a global variable ?
   }  
+  _colorNumber +=  _var;   
+*/
+  setNextColorNumber(); 
 
-  _colorNumber +=  _var;  
   _colorNumber = _colorNumber & 255;
 
   uint32_t calcStripColor = colorWheel(_colorNumber);
@@ -224,7 +314,7 @@ void ArtProject::rgbBand() {
 
 /**
  *  Function   :  rainbowCycle()
- *  Description:  Lights a full LED strand in the same color. 
+ *  Description:  Lights a full LED strand IN THE SAME color. 
  *
  *  Note: The bitwise AND operator  (_colorNumber & 255 ) is not 
  *  really needed. It assures that the value will always be between 
@@ -237,10 +327,10 @@ void ArtProject::rainbowCycle() {
 
   // Computes the next color based on _colorNumber 
   
-  uint32_t currentStripColor = colorWheel(_colorNumber & 255);  // remove &255
+  uint32_t nextStripColor = colorWheel(_colorNumber & 255);  // remove &255
   
   for (uint8_t pixelNr=0; pixelNr< _strip.numPixels(); pixelNr++) {
-    _strip.setPixelColor(pixelNr, currentStripColor);
+    _strip.setPixelColor(pixelNr, nextStripColor);
   }
   _strip.show();
   _colorNumber++;
@@ -301,6 +391,40 @@ uint32_t ArtProject::colorWheel(byte WheelPos) {
   return rgbColorConversion(WheelPos * 3, 255 - WheelPos * 3, 0);
 } 
 
+/*
+ * Function   : hsvToRGBconversion( int 0 .. 100 ) 
+ * Description: Converts an HSV percentage value ( integer between 0 .. 100 ) 
+ *              into an RGB color.
+ *              the HSV transition cycles from green over yellow to red. 
+ *              (no purple or blue colors are used ) 
+ *
+ */ 
+
+uint32_t ArtProject::hsvToRGBconversion(byte percent ) { 
+   uint8_t r, g, b;  
+
+   if (percent < 50) {
+        // green to yellow
+        r = (uint8_t)(255 * (percent / 50.0)); 
+        g = 255;
+
+    } else {
+        // yellow to red
+        r = 255;
+        g = (uint8_t)(255 * ((50 - percent % 50) / 50.0));
+    }
+    b = 0; 
+
+    uint32_t rgbColorEquivalent = rgbColorConversion(r, g, b);
+    return rgbColorEquivalent; 
+}
+
+/*
+ * Function   : lightUp(r, g, b); 
+ * Description: Lights the LED strip up in a specified RGB color, 
+ *              one pixel after the other. 
+ *
+*/
 
 
 void ArtProject::lightUp(uint8_t r, uint8_t g, uint8_t b){ 
