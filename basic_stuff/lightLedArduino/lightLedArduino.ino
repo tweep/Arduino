@@ -1,5 +1,5 @@
 /*
- * Jan's first program to blink an LED on the  
+ *  first program to blink an LED on the  
  * 
  */
 
