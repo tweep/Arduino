@@ -1,0 +1,60 @@
+#ifndef LedStripColorTransitions_h
+#define LedStripColorTransitions_h
+
+
+// enable basic commands: pinMode, digitalWrite, delay,..
+#include "Arduino.h" 
+#include "SpectrumBand.h"
+
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+  #include <avr/power.h>
+#endif
+
+class LedStripColorTransitions {  
+
+   // Class member variables - initialization  
+   public: 
+   LedStripColorTransitions(uint8_t nrLeds, uint8_t pin) ; 
+   LedStripColorTransitions(uint8_t nrLeds, uint8_t pin, uint8_t brightness) ; 
+   LedStripColorTransitions(uint8_t nrLeds, uint8_t pin, uint8_t brightness, uint8_t startColor, uint8_t endColor);  
+
+   // Initialize with SpectrumBand data stucture  
+   LedStripColorTransitions(uint8_t nrLeds, uint8_t pin, uint8_t brightness, SpectrumBand specBand ); 
+
+   ~LedStripColorTransitions();  
+
+   void   
+     percentToRGB(), 
+     hsvbow(),
+     rainbow(), 
+     rainbowCycle(),
+     rgbBand(),
+     lightUp(uint8_t r, uint8_t g, uint8_t b), 
+     setNextColorNumber(),
+     setSpectrumStart(uint8_t start), 
+     setSpectrumEnd(uint8_t end), 
+     setSpectrum(uint8_t start,uint8_t end) ; 
+     //colorWipe(uint32_t color),
+   //static uint32_t 
+    // Color(uint8_t r, uint8_t g, uint8_t b);
+
+
+   private:       
+     uint8_t setNextColorNumber(uint8_t c);  
+
+     uint32_t 
+       colorWheel(byte WheelPos), 
+       hsvToRGBconversion(byte percent); 
+
+     Adafruit_NeoPixel _strip;  
+
+     uint8_t 
+       _colorNumber,                  // 8 bit color number; with values between 0 - 255 (depending on the transition it can also be 0-99) 
+       _spectrumStart,                // Start of the color spectrum band 
+       _spectrumEnd,                  // end of the color spectrum band 
+       _var;
+};  
+
+#endif
+
