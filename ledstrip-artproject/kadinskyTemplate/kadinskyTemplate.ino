@@ -32,7 +32,6 @@ ArtProject a3 = ArtProject(60,PIN6,BRIGHTNESS);
 SpectrumBand sb = { 1,99 } ;
 ArtProject a4 = ArtProject(60, PIN7, BRIGHTNESS, sb);
 
-//ArtProject a4 = ArtProject(60,PIN7,BRIGHTNESS);
 
 /*
 TimedAction stripActionOne = TimedAction(10,&one);
@@ -48,9 +47,9 @@ void setup() {
 void loop() {
     Serial.println("loop()"); 
 
-    // a1.rgbBand();
-    // a2.rainbowCycle();
-    // a3.rainbow();
+     a1.rgbBand();
+     a2.rainbowCycle();
+     a3.rainbow();
 
      // Set the spectrum start and end during runtime ( not during initialization)
      //a3.setSpectrumStart(10);
@@ -59,7 +58,7 @@ void loop() {
 
      //a4.setSpectrumStart(10);
      //a4.setSpectrumEnd(100);
-      a4.percentToRGB();
+     a4.percentToRGB();
 
 }
 
