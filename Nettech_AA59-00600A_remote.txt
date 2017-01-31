@@ -1,4 +1,8 @@
 
+IR remote control codes from the Nettech AA59-00600A New Samsung TV 
+
+
+
 Off     -  E0E040BF 
 Source  -  E0E0807F
 Light   -  OFF  
