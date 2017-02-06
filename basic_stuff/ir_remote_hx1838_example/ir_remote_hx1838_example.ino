@@ -10,7 +10,7 @@
 #include <IRremote.h>
 #include <IRremoteInt.h>
 
-uint8_t RECV_PIN = 7;
+uint8_t RECV_PIN = 8;
 
 IRrecv irrecv(RECV_PIN);
 decode_results results;
@@ -24,11 +24,27 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly
-  
+    
     if (irrecv.decode(&results)) {
-      Serial.println(results.value, HEX);
+      configure_stuff(results.value); 
       irrecv.resume(); // Receive the next value
     }
+    
+    delay(100);
+}
+
+
+void configure_stuff (int tmp) {
+      
+       switch (tmp) {
+         case 0xE0E020DF :
+           Serial.println("dark");
+           break;
+           
+         case 0xE0E0A05F :
+           Serial.println("dim");
+           break;
+       }
+
 }
 
