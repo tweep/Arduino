@@ -4,11 +4,15 @@
 #include "MenuLCD.h"
 #include "MenuManager.h"
 
-//This example is a Stopwatch and Timer.  Although it is mostly functional, it might not be the best
-// user interface.  The layout was created more to provide examples of a stopwatch/timer.
+/* 
+ * This example shows how to connect an 16x2 display similar to this one: 
+ * https://www.amazon.com/gp/product/B006OVYI1G/
+ *
+ */ 
 
 int button = 0 ; 
-int readKey = 0;
+int readKey = 0; 
+
 //Edit your particular harware setup here - See LiquidCrystal documentation for details
 const int LCDD7 = 7;
 const int LCDD6 = 6;
@@ -22,7 +26,8 @@ MenuLCD g_menuLCD( LCDRS, LCDE, LCDD4, LCDD5, LCDD6, LCDD7, 16, 2);
 MenuManager g_menuManager( &g_menuLCD);//pass the g_menuLCD object to the g_menuManager with the & operator.
 
 //Global variables used by the sample application
-//when the display is showing user results (e.g. time elapsed), the next "select" should send it back into the menu.
+//when the display is showing user results (e.g. time elapsed), the next "select" should send it back into the menu. 
+
 unsigned int g_isDisplaying = false;
 
 // LED CONFIG STRAND 1
