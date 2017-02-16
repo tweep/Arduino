@@ -59,7 +59,7 @@ void MenuManager::WipeMenu( MenuLCD::Direction dir )
     for( int i = 0; i < m_pMenuLCD->getCharacters(); ++i )
     { 
       m_pMenuLCD->getLCD()->scrollDisplayLeft();
-      delay(100);
+      delay(75);
     }
   }
   else
@@ -67,7 +67,7 @@ void MenuManager::WipeMenu( MenuLCD::Direction dir )
     for( int i = 0; i < m_pMenuLCD->getCharacters(); ++i )
     {
       m_pMenuLCD->getLCD()->scrollDisplayRight();
-      delay(100);
+      delay(75);
     }
   }
 }
@@ -104,13 +104,13 @@ void MenuManager::DoMenuAction( MENU_ACTION action )
     switch (action )
     {
       case MENU_ACTION_UP:
-        iNewNum = m_pMenuIntHelper->numIncrease();
+        iNewNum = m_pMenuIntHelper->numDecrease();
         itoa( iNewNum, buff, 10 );
         DrawInputRow( buff );
         *m_pInt = iNewNum;
         break;
       case MENU_ACTION_DOWN:
-        iNewNum = m_pMenuIntHelper->numDecrease();
+        iNewNum = m_pMenuIntHelper->numIncrease();
         itoa( iNewNum, buff, 10 );
         DrawInputRow( buff );
         *m_pInt = iNewNum;
