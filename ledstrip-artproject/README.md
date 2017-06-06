@@ -1,5 +1,6 @@
 
-# Ledstrip Art project 
+# Ledstrip Art project (OLD code version- new code here: https://github.com/tweep/ledstrip-artproject.git ) 
+
 This project aims to make an LED art installation of the Vasily Kadinsky "einige kreise" picture
 
 
